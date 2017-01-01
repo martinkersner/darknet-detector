@@ -1,4 +1,4 @@
-#include "image.h"
+#include "detector_image.h"
 
 image ipl_to_image2(IplImage* src)
 {

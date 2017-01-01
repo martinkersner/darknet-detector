@@ -48,14 +48,14 @@ CFLAGS+= -DCUDNN
 LDFLAGS+= -lcudnn
 endif
 
-OBJ=gemm.o utils.o cuda.o convolutional_layer.o list.o image.o activations.o im2col.o col2im.o blas.o crop_layer.o dropout_layer.o maxpool_layer.o softmax_layer.o data.o matrix.o network.o connected_layer.o cost_layer.o parser.o option_list.o detection_layer.o captcha.o route_layer.o writing.o box.o nightmare.o normalization_layer.o avgpool_layer.o dice.o layer.o compare.o classifier.o local_layer.o swag.o shortcut_layer.o activation_layer.o rnn_layer.o gru_layer.o rnn.o rnn_vid.o crnn_layer.o tag.o cifar.o go.o batchnorm_layer.o art.o region_layer.o reorg_layer.o super.o voxel.o tree.o
+OBJ=gemm.o utils.o cuda.o convolutional_layer.o list.o image.o activations.o im2col.o col2im.o blas.o crop_layer.o dropout_layer.o maxpool_layer.o softmax_layer.o data.o matrix.o network.o connected_layer.o cost_layer.o parser.o option_list.o detection_layer.o captcha.o route_layer.o writing.o box.o nightmare.o normalization_layer.o avgpool_layer.o dice.o layer.o compare.o local_layer.o swag.o shortcut_layer.o activation_layer.o rnn_layer.o gru_layer.o rnn.o rnn_vid.o crnn_layer.o tag.o cifar.o go.o batchnorm_layer.o art.o region_layer.o reorg_layer.o super.o voxel.o tree.o
 
 ifeq ($(GPU), 1) 
 LDFLAGS+= -lstdc++ 
 OBJ+=convolutional_kernels.o activation_kernels.o im2col_kernels.o col2im_kernels.o blas_kernels.o crop_layer_kernels.o dropout_layer_kernels.o maxpool_layer_kernels.o network_kernels.o avgpool_layer_kernels.o
 endif
 
-OBJS = $(addprefix $(OBJDIR), $(OBJ) darknet.o demo.o coco.o yolo.o detector.o)
+OBJS = $(addprefix $(OBJDIR), $(OBJ) darknet.o detector.o classifier.o demo.o coco.o yolo.o)
 OBJS_DETECT = $(addprefix $(OBJDIR), $(OBJ))
 DEPS = $(wildcard darknet/src/*.h) Makefile
 DEPS_DETECT = $(wildcard darknet/src/*.h)
@@ -72,8 +72,8 @@ $(OBJDIR)%.o: %.cu $(DEPS)
 	$(NVCC) $(ARCH) $(COMMON) --compiler-options "$(CFLAGS)" -c $< -o $@
 
 EXEC_DETECT=detector_example
-$(EXEC_DETECT): $(EXEC_DETECT).c $(DEPS_DETECT)
-	$(CC) $(COMMON) $(CFLAGS) $^ image.c $(OBJS_DETECT) -o $@ $(LDFLAGS)
+$(EXEC_DETECT): $(EXEC_DETECT).c $(DEPS_DETECT) detector_image.h
+	$(CC) $(COMMON) $(CFLAGS) $^ detector_image.c $(OBJS_DETECT) -o $@ $(LDFLAGS)
 
 obj:
 	mkdir -p darknet/obj

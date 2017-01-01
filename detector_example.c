@@ -2,7 +2,7 @@
 // 2016/12/28
 
 #include "detector_example.h"
-#include "image.h"
+#include "detector_image.h"
 
 void *fetch_in_thread(void *ptr)
 {
