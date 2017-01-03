@@ -85,5 +85,5 @@ results:
 .PHONY: clean
 
 clean:
-	rm -rf $(OBJS) $(EXEC)
+	rm -rf $(OBJS) $(EXEC) $(EXEC_DETECT)
 
