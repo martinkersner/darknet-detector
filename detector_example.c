@@ -58,13 +58,29 @@ double get_wall_time()
   return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
+image **load_alphabet2()
+{
+    int i, j;
+    const int nsize = 8;
+    image **alphabets = calloc(nsize, sizeof(image));
+    for(j = 0; j < nsize; ++j){
+        alphabets[j] = calloc(128, sizeof(image));
+        for(i = 32; i < 127; ++i){
+            char buff[256];
+            sprintf(buff, "darknet/data/labels/%d_%d.png", i, j);
+            alphabets[j][i] = load_image_color(buff, 0, 0);
+        }
+    }
+    return alphabets;
+}
+
 int main(int argc, char **argv) {
   int frame_skip = 0;
   char **names = NULL;
-  int classes = 21;
+  int classes = 0;
   float thresh = 0.4;
 
-  image **alphabet = load_alphabet();
+  image **alphabet = load_alphabet2();
   int delay = frame_skip;
   demo_names = names;
   demo_alphabet = alphabet;
@@ -74,7 +90,7 @@ int main(int argc, char **argv) {
   char *filename   = "/home/martin/DeepLearning/BeaverDam/annotator/static/videos/8.mp4";
   char *weightfile = "/home/martin/github/darknet/yolo.weights";
   char *cfgfile    = "/home/martin/github/darknet/cfg/yolo.cfg";
-  char *prefix     = "";
+  char *prefix     = NULL;
 
   int cam_index = 0;
 
