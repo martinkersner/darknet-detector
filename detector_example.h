@@ -9,6 +9,7 @@
 #include "darknet/src/parser.h"
 #include "darknet/src/box.h"
 #include "darknet/src/image.h"
+#include "darknet/src/option_list.h"
 #include <sys/time.h>
 
 #include "opencv2/highgui/highgui_c.h"

@@ -76,9 +76,12 @@ image **load_alphabet2()
 
 int main(int argc, char **argv) {
   int frame_skip = 0;
-  char **names = NULL;
-  int classes = 0;
   float thresh = 0.4;
+
+  list *options = read_data_cfg("coco.data");
+  int classes = option_find_int(options, "classes", 20);
+  char *name_list = option_find_str(options, "names", "darknet/data/names.list");
+  char **names = get_labels(name_list);
 
   image **alphabet = load_alphabet2();
   int delay = frame_skip;
