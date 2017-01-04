@@ -75,27 +75,22 @@ image **load_alphabet2()
 }
 
 int main(int argc, char **argv) {
-  int frame_skip = 0;
-  float thresh = 0.4;
-
-  list *options = read_data_cfg("coco.data");
-  int classes = option_find_int(options, "classes", 20);
-  char *name_list = option_find_str(options, "names", "darknet/data/names.list");
-  char **names = get_labels(name_list);
-
-  image **alphabet = load_alphabet2();
-  int delay = frame_skip;
-  demo_names = names;
-  demo_alphabet = alphabet;
-  demo_classes = classes;
-  demo_thresh = thresh;
-
   char *filename   = argv[1]; // video file name
   char *weightfile = argv[2]; // *.weights
   char *cfgfile    = argv[3]; // *.cfg
+  char *datafile   = argv[4]; // *.data
 
-  char *prefix     = NULL;
+  int frame_skip = 0;
+  int delay = frame_skip;
 
+  list *options = read_data_cfg(datafile);
+
+  demo_names    = get_labels(option_find_str(options, "names", "darknet/data/names.list"));
+  demo_alphabet = load_alphabet2();
+  demo_classes  = option_find_int(options, "classes", 20);
+  demo_thresh   = 0.4;
+
+  char *prefix  = NULL;
   int cam_index = 0;
 
   net = parse_network_cfg(cfgfile);
@@ -116,7 +111,7 @@ int main(int argc, char **argv) {
 
   if(!cap) error("Couldn't connect to webcam.\n");
 
-  layer l = net.layers[net.n-1];
+  layer l = net.layers[net.n-1]; // last layer
   int j;
 
   avg = (float *) calloc(l.outputs, sizeof(float));
@@ -134,13 +129,7 @@ int main(int argc, char **argv) {
   det = in;
   det_s = in_s;
 
-  fetch_in_thread(0);
-  detect_in_thread(0);
-  disp = det;
-  det = in;
-  det_s = in_s;
-
-  for(j = 0; j < FRAMES/2; ++j){
+  for (j = 0; j < (FRAMES/2)+1; ++j) {
     fetch_in_thread(0);
     detect_in_thread(0);
     disp = det;
@@ -149,7 +138,7 @@ int main(int argc, char **argv) {
   }
 
   int count = 0;
-  if(!prefix){
+  if (!prefix) {
     cvNamedWindow("Demo", CV_WINDOW_NORMAL); 
     cvMoveWindow("Demo", 0, 0);
     cvResizeWindow("Demo", 1352, 1013);
@@ -157,50 +146,34 @@ int main(int argc, char **argv) {
 
   double before = get_wall_time();
 
-  while(1){
+  while (1) {
     ++count;
-    if(1){
-      if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
-      if(pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");
+    if (pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
+    if (pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");
 
-      if(!prefix){
-        show_image(disp, "Demo");
-        int c = cvWaitKey(1);
-        if (c == 10){
-          if(frame_skip == 0) frame_skip = 60;
-          else if(frame_skip == 4) frame_skip = 0;
-          else if(frame_skip == 60) frame_skip = 4;   
-          else frame_skip = 0;
-        }
-      }else{
-        char buff[256];
-        sprintf(buff, "%s_%08d", prefix, count);
-        save_image(disp, buff);
-      }
-
-      pthread_join(fetch_thread, 0);
-      pthread_join(detect_thread, 0);
-
-      if(delay == 0){
-        free_image(disp);
-        disp  = det;
-      }
-      det   = in;
-      det_s = in_s;
-    }else {
-      fetch_in_thread(0);
-      det   = in;
-      det_s = in_s;
-      detect_in_thread(0);
-      if(delay == 0) {
-        free_image(disp);
-        disp = det;
-      }
+    if (!prefix) {
       show_image(disp, "Demo");
       cvWaitKey(1);
     }
+    else {
+      char buff[256];
+      sprintf(buff, "%s_%08d", prefix, count);
+      save_image(disp, buff);
+    }
+
+    pthread_join(fetch_thread, 0);
+    pthread_join(detect_thread, 0);
+
+    if (delay == 0) {
+      free_image(disp);
+      disp = det;
+    }
+
+    det   = in;
+    det_s = in_s;
+
     --delay;
-    if(delay < 0){
+    if (delay < 0) {
       delay = frame_skip;
 
       double after = get_wall_time();
