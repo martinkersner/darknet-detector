@@ -90,9 +90,10 @@ int main(int argc, char **argv) {
   demo_classes = classes;
   demo_thresh = thresh;
 
-  char *filename   = "/home/martin/DeepLearning/BeaverDam/annotator/static/videos/8.mp4";
-  char *weightfile = "/home/martin/github/darknet/yolo.weights";
-  char *cfgfile    = "/home/martin/github/darknet/cfg/yolo.cfg";
+  char *filename   = argv[1]; // video file name
+  char *weightfile = argv[2]; // *.weights
+  char *cfgfile    = argv[3]; // *.cfg
+
   char *prefix     = NULL;
 
   int cam_index = 0;
