@@ -1,6 +1,9 @@
 // Martin Kersner, 2016/12/28
 // 2016/12/28
 
+#ifndef DETECTOR_EXAMPLE_
+#define DETECTOR_EXAMPLE_
+
 #include "darknet/src/network.h"
 #include "darknet/src/detection_layer.h"
 #include "darknet/src/region_layer.h"
@@ -37,3 +40,4 @@ static float fps = 0;
 static float *predictions[FRAMES];
 static image images[FRAMES];
 static float *avg;
+#endif // DETECTOR_EXAMPLE_
